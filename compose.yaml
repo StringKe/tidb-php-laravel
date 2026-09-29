@@ -1,0 +1,15 @@
+# TiDB for the integration tests. `docker compose up -d --wait`, then `composer test`; `docker compose down -v` removes everything.
+name: tidb-php-laravel-tests
+
+services:
+  tidb:
+    image: pingcap/tidb:v8.5.8
+    command: ["--store=unistore", "--path=/tmp/tidb", "--host=0.0.0.0", "--status-host=0.0.0.0"]
+    ports:
+      - "127.0.0.1:4410:4000"
+      - "127.0.0.1:10490:10080"
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "-", "http://127.0.0.1:10080/status"]
+      interval: 2s
+      timeout: 2s
+      retries: 30

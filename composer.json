@@ -1,0 +1,63 @@
+{
+  "name": "stringke/tidb-php-laravel",
+  "description": "Laravel database driver for TiDB on top of the pdo_tidb extension",
+  "type": "library",
+  "license": "Apache-2.0",
+  "keywords": [
+    "laravel",
+    "database",
+    "pdo",
+    "tidb",
+    "auto_random",
+    "stale-read"
+  ],
+  "homepage": "https://github.com/stringke/tidb-php-laravel",
+  "support": {
+    "issues": "https://github.com/stringke/tidb-php-laravel/issues",
+    "source": "https://github.com/stringke/tidb-php-laravel"
+  },
+  "require": {
+    "php": ">=8.4",
+    "ext-pdo_tidb": "*",
+    "illuminate/console": "^13.0",
+    "illuminate/database": "^13.0",
+    "illuminate/support": "^13.0"
+  },
+  "require-dev": {
+    "larastan/larastan": "^3.12",
+    "laravel/pint": "^1.32",
+    "orchestra/testbench": "^11.0",
+    "pestphp/pest": "^5.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "StringKe\\TidbPhp\\Laravel\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "StringKe\\TidbPhp\\Laravel\\Tests\\": "tests/"
+    }
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "StringKe\\TidbPhp\\Laravel\\TidbServiceProvider"
+      ]
+    }
+  },
+  "scripts": {
+    "lint": "pint --test",
+    "format": "pint",
+    "typecheck": "phpstan analyse --no-progress",
+    "test": "pest"
+  },
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  },
+  "minimum-stability": "stable",
+  "prefer-stable": true
+}
