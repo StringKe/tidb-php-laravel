@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\DB;
 use StringKe\TidbPhp\Laravel\TidbBlueprint;
 use StringKe\TidbPhp\Laravel\TidbConnection;
+use StringKe\TidbPhp\Laravel\TidbIndexDefinition;
 use StringKe\TidbPhp\Laravel\UnsupportedFeatureException;
 
 /**
@@ -89,6 +90,22 @@ test('table options on an existing table compile as ALTER, TiFlash replicas and 
         'alter table `orders` alter index `orders_a_index` invisible',
         'alter table `orders` add index `orders_email_index` ((lower(email))) invisible',
     ])->and(fn () => tidbSql(fn (TidbBlueprint $table) => $table->preSplitRegions(1)))->toThrow(UnsupportedFeatureException::class);
+});
+
+test('index commands return TiDB index definitions whose modifiers compile on an existing table', function (): void {
+    $sql = tidbSql(function (TidbBlueprint $table): void {
+        expect($table->primary('id')->clustered(false)->comment('订单身份'))->toBeInstanceOf(TidbIndexDefinition::class)
+            ->and($table->unique('no')->comment('订单号')->global()->lock('none'))->toBeInstanceOf(TidbIndexDefinition::class)
+            ->and($table->index('created_at')->comment("按'下单'时刻")->invisible()->inplace())->toBeInstanceOf(TidbIndexDefinition::class)
+            ->and($table->rawIndex('lower(email)', 'orders_email_index')->comment('邮箱'))->toBeInstanceOf(TidbIndexDefinition::class);
+    });
+
+    expect($sql)->toBe([
+        "alter table `orders` add primary key (`id`) nonclustered comment '订单身份'",
+        "alter table `orders` add unique key `orders_no_unique` (`no`) comment '订单号' global, lock=none",
+        "alter table `orders` add index `orders_created_at_index` (`created_at`) comment '按''下单''时刻' invisible, algorithm=inplace",
+        "alter table `orders` add index `orders_email_index` ((lower(email))) comment '邮箱'",
+    ]);
 });
 
 test('vector columns get an HNSW index over the chosen distance', function (): void {

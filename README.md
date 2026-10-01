@@ -72,7 +72,7 @@ Session variables travel in the DSN, so `pdo_tidb` applies them again after a re
 
 ## Schema
 
-`Schema::create()` and `Schema::table()` pass a `TidbBlueprint`, and `bigInteger()` returns a `TidbColumnDefinition`.
+`Schema::create()` and `Schema::table()` pass a `TidbBlueprint`. `bigInteger()` returns a `TidbColumnDefinition`, and `primary()`, `unique()`, `index()`, `rawIndex()` and `vectorIndex()` return a `TidbIndexDefinition`, so static analysis sees the TiDB modifiers when the closure parameter is typed `TidbBlueprint`.
 
 - `autoRandom($column = 'id', $shardBits, $rangeBits)` adds a clustered `AUTO_RANDOM` primary key; `bigInteger('id')->autoRandom(...)` does the same for an existing column definition and with `change()` raises the shard bits of an existing key.
 - Primary keys take `clustered()` or `clustered(false)`. Primary keys, unique keys and indexes created with the table are written into `CREATE TABLE`. Indexes accept expressions (`index([DB::raw('lower(email)')])`), `comment()`, `invisible()` and `global()`, and `makeIndexVisible()` and `makeIndexInvisible()` switch visibility later.

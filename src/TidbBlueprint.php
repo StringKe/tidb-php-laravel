@@ -2,6 +2,7 @@
 
 namespace StringKe\TidbPhp\Laravel;
 
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Fluent;
 
@@ -29,6 +30,76 @@ class TidbBlueprint extends Blueprint
     public function bigInteger($column, $autoIncrement = false, $unsigned = false): TidbColumnDefinition
     {
         return $this->addColumn('bigInteger', $column, ['autoIncrement' => $autoIncrement, 'unsigned' => $unsigned]);
+    }
+
+    /**
+     * @param  string|array<array-key, mixed>  $columns
+     * @param  string|null  $name
+     * @param  string|null  $algorithm
+     */
+    public function primary($columns, $name = null, $algorithm = null): TidbIndexDefinition
+    {
+        return $this->indexCommand('primary', $columns, $name, $algorithm);
+    }
+
+    /**
+     * @param  string|array<array-key, mixed>  $columns
+     * @param  string|null  $name
+     * @param  string|null  $algorithm
+     */
+    public function unique($columns, $name = null, $algorithm = null): TidbIndexDefinition
+    {
+        return $this->indexCommand('unique', $columns, $name, $algorithm);
+    }
+
+    /**
+     * @param  string|array<array-key, mixed>  $columns
+     * @param  string|null  $name
+     * @param  string|null  $algorithm
+     */
+    public function index($columns, $name = null, $algorithm = null): TidbIndexDefinition
+    {
+        return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * @param  literal-string  $expression
+     * @param  string  $name
+     */
+    public function rawIndex($expression, $name): TidbIndexDefinition
+    {
+        return $this->index([new Expression($expression)], $name);
+    }
+
+    /**
+     * @param  string  $column
+     * @param  string|null  $name
+     */
+    public function vectorIndex($column, $name = null): TidbIndexDefinition
+    {
+        return $this->indexCommand('vectorIndex', $column, $name, 'hnsw', 'vector_cosine_ops');
+    }
+
+    /**
+     * @param  string  $type
+     * @param  string|array<array-key, mixed>  $columns
+     * @param  string|null  $index
+     * @param  string|null  $algorithm
+     * @param  string|null  $operatorClass
+     */
+    protected function indexCommand($type, $columns, $index, $algorithm = null, $operatorClass = null): TidbIndexDefinition
+    {
+        $columns = (array) $columns;
+
+        $this->commands[] = $definition = new TidbIndexDefinition([
+            'name' => $type,
+            'index' => $index ?: $this->createIndexName($type, $columns),
+            'columns' => $columns,
+            'algorithm' => $algorithm,
+            'operatorClass' => $operatorClass,
+        ]);
+
+        return $definition;
     }
 
     /**

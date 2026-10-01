@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-10-01
+
+### Added
+
+- `TidbIndexDefinition`, returned by `primary()`, `unique()`, `index()`, `rawIndex()` and `vectorIndex()` on `TidbBlueprint`, with typed `comment()`, `invisible()`, `global()` and `clustered()` modifiers.
+
 ## [0.1.0] - 2026-09-29
 
 First release.
@@ -17,4 +23,5 @@ First release.
 - `TidbConnection` methods for stale reads, `LOAD DATA LOCAL`, session control, query control and connection info, all running through Laravel's query pipeline. TiDB write conflicts are retried as concurrency errors.
 - Compile-time `UnsupportedFeatureException` for every feature TiDB ignores silently or rejects.
 
+[0.1.1]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/stringke/tidb-php-laravel/releases/tag/v0.1.0
