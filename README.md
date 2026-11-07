@@ -50,7 +50,7 @@ The service provider is registered through package discovery.
 | `host`, `port`, `unix_socket`, `database`, `username`, `password` | connection target and credentials; a socket replaces host and port |
 | `charset`, `collation`, `timezone` | connection character set, collation and session time zone |
 | `strict`, `modes`, `isolation_level` | `sql_mode` and `transaction_isolation` of the session |
-| `settings` | further session variables, for example `tidb_mem_quota_query` |
+| `settings` | further session variables, for example `tidb_mem_quota_query`; `tidb_ignore_prepared_cache_close_stmt` defaults to `ON` because Laravel closes each prepared statement after it runs and TiDB would otherwise drop the cached plan with it, set it to `null` to leave the server value |
 | `attributes` | connection attributes shown in `information_schema.processlist` |
 | `sslmode`, `ssl_*`, `tls_version`, `compression`, `zstd_level`, timeouts, `discover`, `max_lifetime`, `idle_ping` and the other `pdo_tidb` keys | written into the DSN as is |
 | `auto_random` | default `shard_bits` and `range_bits` for `autoRandom()` columns that give none |

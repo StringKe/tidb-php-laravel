@@ -22,15 +22,23 @@ test('the DSN carries connection keys, session variables and attributes', functi
     ]);
 
     expect($dsn)->toBe('tidb:dbname=d;host=h;port=4000;charset=utf8mb4;sslmode=verify_identity;discover=1;time_zone=+00:00;'
-        .'session.transaction_isolation=READ-COMMITTED;'
+        .'session.tidb_ignore_prepared_cache_close_stmt=ON;session.transaction_isolation=READ-COMMITTED;'
         .'session.sql_mode=ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION;'
         .'session.tidb_mem_quota_query=1073741824;attr.app=growth');
+});
+
+test('the plan cache survives statement close unless the connection settings override it', function (): void {
+    $connector = new TidbConnector;
+
+    expect($connector->dsn(['host' => 'h']))->toBe('tidb:host=h;session.tidb_ignore_prepared_cache_close_stmt=ON')
+        ->and($connector->dsn(['host' => 'h', 'settings' => ['tidb_ignore_prepared_cache_close_stmt' => 'OFF']]))->toBe('tidb:host=h;session.tidb_ignore_prepared_cache_close_stmt=OFF')
+        ->and($connector->dsn(['host' => 'h', 'settings' => ['tidb_ignore_prepared_cache_close_stmt' => null]]))->toBe('tidb:host=h');
 });
 
 test('a unix socket replaces host and port, and values that would break the DSN are rejected', function (): void {
     $connector = new TidbConnector;
 
-    expect($connector->dsn(['host' => 'h', 'port' => 4000, 'unix_socket' => '/tmp/tidb.sock', 'database' => 'd']))->toBe('tidb:dbname=d;unix_socket=/tmp/tidb.sock')
+    expect($connector->dsn(['host' => 'h', 'port' => 4000, 'unix_socket' => '/tmp/tidb.sock', 'database' => 'd']))->toBe('tidb:dbname=d;unix_socket=/tmp/tidb.sock;session.tidb_ignore_prepared_cache_close_stmt=ON')
         ->and(fn () => $connector->dsn(['host' => 'h', 'settings' => ['a' => 'x;y']]))->toThrow(LogicException::class, '[session.a]')
         ->and(fn () => $connector->dsn(['host' => 'h', 'settings' => ['a-b' => '1']]))->toThrow(LogicException::class, '[session.a-b]')
         ->and(fn () => $connector->dsn(['host' => 'h', 'attributes' => ['a' => ['x']]]))->toThrow(LogicException::class, '[attr.a]');

@@ -86,7 +86,8 @@ final class TidbConnector extends Connector implements ConnectorInterface
      */
     private function sessionVariables(array $config): array
     {
-        $variables = [];
+        // Laravel closes every prepared statement right after it runs; with TiDB's default the close also drops the cached plan, so the plan cache never hits.
+        $variables = ['tidb_ignore_prepared_cache_close_stmt' => 'ON'];
 
         if (isset($config['isolation_level'])) {
             $variables['transaction_isolation'] = str_replace(' ', '-', strtoupper((string) $config['isolation_level']));
