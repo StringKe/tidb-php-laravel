@@ -2,6 +2,12 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.4] - 2026-11-12
+
+### Fixed
+
+- `exists()` on a locking read (`lockForUpdate()`, `lock(...)`) or on a builder with `groupLimit()` compiles without the added `limit 1`, so the locking read still locks every matching row and the per-group limit keeps its offset.
+
 ## [0.1.3] - 2026-11-12
 
 ### Fixed
@@ -35,6 +41,7 @@ First release.
 - `TidbConnection` methods for stale reads, `LOAD DATA LOCAL`, session control, query control and connection info, all running through Laravel's query pipeline. TiDB write conflicts are retried as concurrency errors.
 - Compile-time `UnsupportedFeatureException` for every feature TiDB ignores silently or rejects.
 
+[0.1.4]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.0...v0.1.1
