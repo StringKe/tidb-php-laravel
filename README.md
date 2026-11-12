@@ -66,6 +66,7 @@ Session variables travel in the DSN, so `pdo_tidb` applies them again after a re
 - `whereLike()` is case-insensitive through `lower()` unless `caseSensitive` is set, which compiles to `like binary`. It behaves the same under `utf8mb4_bin` and the case-insensitive collations.
 - JSON paths compile to `json_extract()` and `json_unquote()`. `whereJsonContains()`, `whereJsonOverlaps()`, `whereJsonContainsKey()`, `whereJsonLength()` and in-place JSON path updates use the TiDB JSON functions.
 - `upsert()` updates from `values()`, because TiDB does not bind the row alias.
+- `exists()` and `doesntExist()` put `limit 1` into the subquery when the builder has no limit and no union. TiDB does not stop an `EXISTS` subquery in the select list at the first row.
 - `selectVectorDistance()` and the other vector distance helpers use `vec_cosine_distance()`.
 - `lockForUpdate()` and `lock('for update nowait' | 'for update wait n' | 'for update of ...')` compile as given.
 - `insertGetId()` returns the generated `AUTO_RANDOM` or `AUTO_INCREMENT` value.

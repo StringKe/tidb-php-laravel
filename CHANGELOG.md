@@ -2,6 +2,18 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.3] - 2026-11-12
+
+### Fixed
+
+- `exists()` and `doesntExist()` compile the subquery with `limit 1` when the builder has no limit and no union. TiDB does not stop an `EXISTS` subquery in the select list at the first row, so the unlimited form read every matching row, and on a selective filter it picked a full table scan.
+
+## [0.1.2] - 2026-11-07
+
+### Changed
+
+- The connector sends `tidb_ignore_prepared_cache_close_stmt=ON` by default, so the prepared plan cache survives Laravel closing every statement after it runs. Connection settings may override it or set it to null to keep the server value.
+
 ## [0.1.1] - 2026-10-01
 
 ### Added
@@ -23,5 +35,7 @@ First release.
 - `TidbConnection` methods for stale reads, `LOAD DATA LOCAL`, session control, query control and connection info, all running through Laravel's query pipeline. TiDB write conflicts are retried as concurrency errors.
 - Compile-time `UnsupportedFeatureException` for every feature TiDB ignores silently or rejects.
 
+[0.1.3]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/stringke/tidb-php-laravel/compare/v0.1.0...v0.1.1
 [0.1.0]: https://github.com/stringke/tidb-php-laravel/releases/tag/v0.1.0

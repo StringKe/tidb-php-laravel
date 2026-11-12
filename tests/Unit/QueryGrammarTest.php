@@ -33,6 +33,16 @@ test('an aggregate keeps the hints on the inner select', function (): void {
     expect($query->toSql())->toBe('select /*+ STREAM_AGG() */ count(*) as `aggregate` from `orders`');
 });
 
+test('exists() stops the subquery at the first row and leaves the builder unchanged', function (): void {
+    $query = tidbQuery()->where('user_id', 1)->orderByDesc('created_at');
+    $grammar = $query->getGrammar();
+
+    expect($grammar->compileExists($query))->toBe('select exists(select * from `orders` where `user_id` = ? order by `created_at` desc limit 1) as `exists`')
+        ->and($query->limit)->toBeNull()
+        ->and($grammar->compileExists(tidbQuery()->limit(5)->offset(10)))->toBe('select exists(select * from `orders` limit 5 offset 10) as `exists`')
+        ->and($grammar->compileExists(tidbQuery()->union(tidbQuery('refunds'))))->toBe('select exists((select * from `orders`) union (select * from `refunds`)) as `exists`');
+});
+
 test('asOf reads every table in the statement at the same time and blocks writes', function (): void {
     $at = CarbonImmutable::parse('2026-09-29T10:00:00.123456Z');
 

@@ -49,6 +49,18 @@ class TidbQueryGrammar extends Grammar
     }
 
     /**
+     * TiDB does not stop an EXISTS subquery in the select list at the first row: without a LIMIT it reads every matching row.
+     */
+    public function compileExists(Builder $query)
+    {
+        if ($query->limit === null && empty($query->unions)) {
+            $query = (clone $query)->limit(1);
+        }
+
+        return parent::compileExists($query);
+    }
+
+    /**
      * @param  Expression|string  $table
      */
     protected function compileFrom(Builder $query, $table)

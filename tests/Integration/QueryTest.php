@@ -32,6 +32,14 @@ test('hints, the query timeout and index hints execute on the server', function 
         ->and(orders()->hint('NO_INDEX_MERGE()')->where('amount', 11)->delete())->toBe(1);
 });
 
+test('exists() answers with the limited subquery, also for ordered and paged builders', function (): void {
+    expect(orders()->where('amount', '>', 8)->orderByDesc('amount')->exists())->toBeTrue()
+        ->and(orders()->where('amount', '>', 10)->exists())->toBeFalse()
+        ->and(orders()->where('amount', '>', 8)->doesntExist())->toBeFalse()
+        ->and(orders()->orderBy('amount')->offset(9)->limit(5)->exists())->toBeTrue()
+        ->and(orders()->orderBy('amount')->offset(10)->limit(5)->exists())->toBeFalse();
+});
+
 test('asOf reads the snapshot from before a change', function (): void {
     $at = new DateTimeImmutable((string) test()->tidb->scalar('select now(6)'), new DateTimeZone('UTC'));
 
